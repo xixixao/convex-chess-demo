@@ -10,10 +10,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.4.4",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "convex": "latest",
+    "framer-motion": "^8.0.2",
     "next": "latest",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-chess-pieces": "^1.0.5",
+    "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.5"
   },
   "devDependencies": {
     "@types/node": "^18.11.11",

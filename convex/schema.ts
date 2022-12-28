@@ -1,8 +1,16 @@
 import { defineSchema, defineTable, s } from 'convex/schema'
 
 export default defineSchema({
-  messages: defineTable({
-    author: s.string(),
-    body: s.string(),
+  games: defineTable({
+    code: s.string(),
+    players: s.map(
+      s.string(),
+      s.object({
+        side: s.string(),
+        name: s.string(),
+      })
+    ),
+    currentSide: s.string(),
+    moves: s.array(s.array(s.array(s.number()))),
   }),
 })
