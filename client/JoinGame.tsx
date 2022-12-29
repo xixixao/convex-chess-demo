@@ -46,9 +46,9 @@ export default function JoinGame() {
       ) : (
         <>
           <div>The first player to join will be white.</div>
-          {lobbyState?.numPlayersJoined ?? 0 >= 2 ? (
+          {(lobbyState?.numPlayersJoined ?? 0) >= 2 ? (
             <div>The game is full</div>
-          ) : lobbyState?.numPlayersJoined ?? 0 >= 1 ? (
+          ) : (lobbyState?.numPlayersJoined ?? 0) >= 1 ? (
             <div>You will be black</div>
           ) : null}
           What will be your nickname for this game?
