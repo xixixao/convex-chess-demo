@@ -1,40 +1,32 @@
 import {
-  Box,
   Button,
   Container,
   Divider,
-  Flex,
   Heading,
-  HStack,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-  VStack,
+  Spinner,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { FormEvent, useEffect, useState } from 'react'
-import { useMutation } from '../convex/_generated/react'
+import { useState } from 'react'
 import { useErrorModal } from '../client/useErrorModal'
+import { useMutation, useQuery } from '../convex/_generated/react'
 
-export default function JoinGame(props: {
-  setPlayerID: (playerID: string | null) => void
-}) {
+export default function JoinGame() {
+  const router = useRouter()
+  const code = String(router.query.code)
   const [nickname, nicknameInput] = useNicknameInput()
-  const [password, passwordInput] = usePasswordInput()
+  const [isJoining, setIsJoining] = useState(false)
+  const lobbyState = useQuery('lobbyState', code)
   const [joinGameErrorModal, showJoinGameErrorModal] = useErrorModal(
     'Could not join the game, please try again'
   )
-  const router = useRouter()
-  const code = String(router.query.code)
   const joinGame = useMutation('joinGame')
   const handleJoinGame = () => {
+    setIsJoining(true)
     joinGame(code, nickname)
-      .then(props.setPlayerID)
+      .then((playerID) => {
+        window.location.href = `/game/${code.toUpperCase()}/${playerID}`
+      })
       .catch((error) => {
         showJoinGameErrorModal(error.message)
       })
@@ -49,10 +41,21 @@ export default function JoinGame(props: {
       </div>
       <div>Send it to your friend so that they can join the game.</div>
       <Divider />
-      <div>The first player to join will be white.</div>
-      What will be your nickname for this game?
-      {nicknameInput}
-      <Button onClick={handleJoinGame}>Join</Button>
+      {isJoining ? (
+        <Spinner />
+      ) : (
+        <>
+          <div>The first player to join will be white.</div>
+          {lobbyState?.numPlayersJoined ?? 0 >= 2 ? (
+            <div>The game is full</div>
+          ) : lobbyState?.numPlayersJoined ?? 0 >= 1 ? (
+            <div>You will be black</div>
+          ) : null}
+          What will be your nickname for this game?
+          {nicknameInput}
+          <Button onClick={handleJoinGame}>Join</Button>
+        </>
+      )}
     </Container>
   )
 }

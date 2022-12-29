@@ -1,10 +1,12 @@
 import { generateCode } from '../server/generateCode'
 import { mutation } from './_generated/server'
 
+const CODE_LENGTH = 3
+
 export default mutation(async ({ db }) => {
   let code = null
   while (code == null) {
-    const newCode = generateCode()
+    const newCode = generateCode(CODE_LENGTH)
     const existing = await db
       .query('games')
       .filter((q) => q.eq(q.field('code'), newCode))

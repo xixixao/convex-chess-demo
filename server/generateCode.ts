@@ -1,8 +1,6 @@
-const CODE_LENGTH = 3
-
-export function generateCode() {
+export function generateCode(codeLength: number) {
   let code = ''
-  for (let i = 0; i < CODE_LENGTH; i++) {
+  for (let i = 0; i < codeLength; i++) {
     code += generateCodeChar()
   }
   return code

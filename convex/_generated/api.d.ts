@@ -13,6 +13,7 @@ import type { ApiFromModules } from "convex/api";
 import type * as createGame from "../createGame";
 import type * as gameState from "../gameState";
 import type * as joinGame from "../joinGame";
+import type * as lobbyState from "../lobbyState";
 import type * as movePiece from "../movePiece";
 
 /**
@@ -28,5 +29,6 @@ export type API = ApiFromModules<{
   createGame: typeof createGame;
   gameState: typeof gameState;
   joinGame: typeof joinGame;
+  lobbyState: typeof lobbyState;
   movePiece: typeof movePiece;
 }>;

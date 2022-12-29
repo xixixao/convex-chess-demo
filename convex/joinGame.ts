@@ -30,11 +30,17 @@ async function addPlayer(
   side: string,
   name: string
 ) {
-  let playerID = generateCode()
+  let playerID = generatePlayerID()
   while (players.has(playerID)) {
-    playerID = generateCode()
+    playerID = generatePlayerID()
   }
   players.set(playerID, { side, name })
   await db.patch(game._id, { players })
   return playerID
+}
+
+const PLAYER_ID_LENGTH = 10
+
+function generatePlayerID() {
+  return generateCode(PLAYER_ID_LENGTH)
 }

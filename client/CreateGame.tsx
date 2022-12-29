@@ -2,36 +2,29 @@ import {
   Box,
   Button,
   Container,
-  Flex,
   Heading,
-  HStack,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-  VStack,
+  Spinner,
 } from '@chakra-ui/react'
-import { FormEvent, useEffect, useState } from 'react'
-import { useMutation, useQuery } from '../convex/_generated/react'
+import { useState } from 'react'
 import { useErrorModal } from '../client/useErrorModal'
+import { useMutation } from '../convex/_generated/react'
 
 export default function CreateGame() {
+  const [isCreating, setIsCreating] = useState(false)
   const [createGameErrorModal, showCreateGameErrorModal] = useErrorModal(
     'Could not create game, please try again'
   )
 
   const createGame = useMutation('createGame')
   const handleCreateGame = () => {
+    setIsCreating(true)
     createGame()
       .then((result) => {
         window.location.href = `/game/${result.toUpperCase()}`
       })
       .catch((error) => {
-        showCreateGameErrorModal()
+        showCreateGameErrorModal(error.message)
       })
   }
 
@@ -40,10 +33,16 @@ export default function CreateGame() {
       {createGameErrorModal}
       <Heading as="h1">Welcome to online chess!</Heading>
       <Box>No sign up required.</Box>
-      <Button onClick={handleCreateGame}>Create a game</Button>
-      or
-      <div>Join a game:</div>
-      <Input width={180} placeholder="Enter game code" />
+      {isCreating ? (
+        <Spinner />
+      ) : (
+        <>
+          <Button onClick={handleCreateGame}>Create a game</Button>
+          or
+          <div>Join a game:</div>
+          <Input width={180} placeholder="Enter game code" />
+        </>
+      )}
     </Container>
   )
 }

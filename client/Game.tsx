@@ -17,6 +17,7 @@ import {
   VStack,
   Spinner,
   background,
+  Divider,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useRef, useState } from 'react'
@@ -30,28 +31,29 @@ import Draggable, {
   DraggableEventHandler,
 } from 'react-draggable'
 
-export default function Game(props: { playerID: string }) {
+export default function Game() {
   return (
     <Container my={10} centerContent gap={4}>
       <Heading as="h1">The game is afoot!</Heading>
-      <Board playerID={props.playerID} />
+      <Board />
     </Container>
   )
 }
 
-function Board(props: { playerID: string }) {
+function Board() {
   const router = useRouter()
   const code = String(router.query.code)
-  const gameState = useQuery('gameState', code, props.playerID)
+  const playerID = String(router.query.playerID)
+  const gameState = useQuery('gameState', code, playerID)
   const movePiece = useMutation('movePiece')
 
   if (gameState == null) {
-    return null
+    return <Spinner />
   }
 
   const pieceLookup = getPositionLookup(getBoard(gameState.moves))
   const handleMovePiece = (piece: Piece, x: number, y: number) => {
-    movePiece(code, props.playerID, [piece.position, [x, y]])
+    movePiece(code, playerID, [piece.position, [x, y]])
   }
   return (
     <>
@@ -97,6 +99,8 @@ function Board(props: { playerID: string }) {
       {gameState.currentSide === gameState.viewer.side
         ? "It's your turn!"
         : "It's your opponent's turn!"}
+      <Divider />
+      Bookmark this page to come back to the game.
     </>
   )
 }
@@ -156,7 +160,6 @@ function DraggablePiece(props: {
           const y = Number(cell.getAttribute('data-y'))
           if (x !== props.piece.position[0] || y !== props.piece.position[1]) {
             props.movePiece(props.piece, x, y)
-            // get relative position of data.node to cell
             const startPosition = startPositionRef.current!
             const cellRect = cell.getBoundingClientRect()
             setPosition({
@@ -185,7 +188,6 @@ function DraggablePiece(props: {
 function getBoard(moves: Array<[Position, Position]>) {
   const board = defaultBoard('white').concat(defaultBoard('black'))
   moves.forEach(([from, to]) => {
-    // remove piece at to
     const index = board.findIndex(
       (piece) => piece.position[0] === to[0] && piece.position[1] === to[1]
     )
@@ -241,8 +243,4 @@ function findParentElement(
     return node
   }
   return findParentElement(node.parentElement, filter)
-}
-
-function oppositeSide(side: 'white' | 'black') {
-  return side === 'white' ? 'black' : 'white'
 }
