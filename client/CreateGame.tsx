@@ -8,35 +8,30 @@ import {
   Spinner,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { useErrorModal } from '../client/useErrorModal'
-import { useMutation } from '../convex/_generated/react'
 import { CODE_LENGTH } from '../shared/Code'
+import { useStatefulMutation } from './useStatefulMutation'
 
 export default function CreateGame() {
-  const [isCreating, setIsCreating] = useState(false)
-  const [createGameErrorModal, showCreateGameErrorModal] = useErrorModal(
-    'Could not create game, please try again'
+  const [createMutation, createGame] = useStatefulMutation(
+    'createGame',
+    'Could not create game, please try again',
+    { repeateable: false },
   )
-  const joinGameInput = useJoinGameInput()
 
-  const createGame = useMutation('createGame')
   const handleCreateGame = () => {
-    setIsCreating(true)
-    createGame()
-      .then((result) => {
-        window.location.href = `/game/${result.toUpperCase()}`
-      })
-      .catch((error) => {
-        showCreateGameErrorModal(error.message)
-      })
+    createGame([], (result) => {
+      window.location.href = `/game/${result.toUpperCase()}`
+    })
   }
+
+  const joinGameInput = useJoinGameInput()
 
   return (
     <Container my={40} centerContent gap={4}>
-      {createGameErrorModal}
+      {createMutation.errorModal}
       <Heading as="h1">Welcome to online chess!</Heading>
       <Box>No sign up required.</Box>
-      {isCreating ? (
+      {createMutation.inFlight ? (
         <Spinner />
       ) : (
         <>
@@ -52,25 +47,23 @@ export default function CreateGame() {
 
 function useJoinGameInput() {
   const [code, setCode] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const checkGame = useMutation('checkGame')
-  const [errorModal, showErrorModal] = useErrorModal('This code is not valid')
+
+  const [checkMutation, checkGame] = useStatefulMutation(
+    'checkGame',
+    'This code is not valid',
+    { repeateable: false },
+  )
+
   useEffect(() => {
     if (code.length === CODE_LENGTH) {
-      setIsLoading(true)
-      checkGame(code)
-        .then((_success) => {
-          window.location.href = `/game/${code.toUpperCase()}`
-        })
-        .catch((error) => {
-          setIsLoading(false)
-          showErrorModal(error.message)
-        })
+      checkGame([code], (_success) => {
+        window.location.href = `/game/${code.toUpperCase()}`
+      })
     }
   }, [code])
   return (
     <Flex alignItems="center" gap={2}>
-      {errorModal}
+      {checkMutation.errorModal}
       <Box width="34px" />
       <Input
         width={180}
@@ -80,7 +73,7 @@ function useJoinGameInput() {
         }}
       />
       <Box width="34px">
-        <Spinner hidden={!isLoading} size="md" />
+        <Spinner hidden={!checkMutation.inFlight} size="md" />
       </Box>
     </Flex>
   )

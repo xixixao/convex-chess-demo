@@ -7,7 +7,7 @@ export default mutation(
     { db },
     code: string,
     playerID: string,
-    move: [Position, Position]
+    move: [Position, Position],
   ) => {
     const game = await findGame(db, code)
     if (game == null) {
@@ -27,5 +27,5 @@ export default mutation(
       currentSide: game.currentSide === 'white' ? 'black' : 'white',
       moves: [...game.moves, move],
     })
-  }
+  },
 )

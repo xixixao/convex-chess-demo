@@ -28,7 +28,7 @@ async function addPlayer(
   game: Document<'games'>,
   players: Document<'games'>['players'],
   side: string,
-  name: string
+  name: string,
 ) {
   let playerID = generatePlayerID()
   while (players.has(playerID)) {

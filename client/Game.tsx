@@ -1,37 +1,20 @@
 import {
   Box,
-  Button,
   Container,
-  Flex,
-  SimpleGrid,
-  Heading,
-  HStack,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-  VStack,
-  Spinner,
-  background,
   Divider,
+  Heading,
+  SimpleGrid,
   Skeleton,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 // @ts-ignore
 import Piece from 'react-chess-pieces'
-import { useMutation, useQuery } from '../convex/_generated/react'
-import type { GameState, Position } from '../shared/GameState'
-import Draggable, {
-  DraggableData,
-  DraggableEvent,
-  DraggableEventHandler,
-} from 'react-draggable'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
+import { useQuery } from '../convex/_generated/react'
+import type { Position } from '../shared/GameState'
 import { Shimmer } from './Shimmer'
+import { useStatefulMutation } from './useStatefulMutation'
 
 export default function Game() {
   return (
@@ -49,27 +32,22 @@ function Board() {
   const code = String(router.query.code ?? '')
   const playerID = String(router.query.playerID ?? '')
   const gameState = useQuery('gameState', code, playerID)
-  const movePiece = useMutation('movePiece')
+  const [moveMutation, movePiece] = useStatefulMutation(
+    'movePiece',
+    'Invalid move',
+  )
 
   if (gameState == null) {
-    return (
-      <>
-        <Shimmer width="60%" />
-        <Checkered>
-          {(rowIndex, colIndex) => (
-            <Skeleton width={CELL_SIZE} height={CELL_SIZE} />
-          )}
-        </Checkered>
-      </>
-    )
+    return <BoardShimmer />
   }
 
   const pieceLookup = getPositionLookup(getBoard(gameState.moves))
   const handleMovePiece = (piece: Piece, x: number, y: number) => {
-    movePiece(code, playerID, [piece.position, [x, y]])
+    movePiece([code, playerID, [piece.position, [x, y]]])
   }
   return (
     <>
+      {moveMutation.errorModal}
       <div>
         {gameState.otherPlayer == null ? (
           <>
@@ -116,13 +94,26 @@ function Board() {
   )
 }
 
+function BoardShimmer() {
+  return (
+    <>
+      <Shimmer width="60%" />
+      <Checkered>
+        {(_rowIndex, _colIndex) => (
+          <Skeleton width={CELL_SIZE} height={CELL_SIZE} />
+        )}
+      </Checkered>
+    </>
+  )
+}
+
 function Checkered(props: {
   children: (rowIndex: number, colIndex: number) => React.ReactNode
 }) {
   return (
     <SimpleGrid columns={8} spacing={1}>
       {[...Array(8)].map((_, rowIndex) =>
-        [...Array(8)].map((_, colIndex) => props.children(rowIndex, colIndex))
+        [...Array(8)].map((_, colIndex) => props.children(rowIndex, colIndex)),
       )}
     </SimpleGrid>
   )
@@ -147,12 +138,12 @@ function DraggablePiece(props: {
     const otherElement = document
       .elementsFromPoint(
         left + node.clientWidth / 2,
-        top + node.clientHeight / 2
+        top + node.clientHeight / 2,
       )
       .find((element) => !node.contains(element))
     return findParentElement(
       otherElement,
-      (node) => node.getAttribute('data-name') === 'cell'
+      (node) => node.getAttribute('data-name') === 'cell',
     )
   }
   const handleDrag = (_event: DraggableEvent, data: DraggableData) => {
@@ -212,14 +203,14 @@ function getBoard(moves: Array<[Position, Position]>) {
   const board = defaultBoard('white').concat(defaultBoard('black'))
   moves.forEach(([from, to]) => {
     const index = board.findIndex(
-      (piece) => piece.position[0] === to[0] && piece.position[1] === to[1]
+      (piece) => piece.position[0] === to[0] && piece.position[1] === to[1],
     )
     if (index !== -1) {
       board.splice(index, 1)
     }
 
     const piece = board.find(
-      (piece) => piece.position[0] === from[0] && piece.position[1] === from[1]
+      (piece) => piece.position[0] === from[0] && piece.position[1] === from[1],
     )
     if (piece != null) {
       piece.position = to
@@ -236,7 +227,7 @@ function defaultBoard(side: 'white' | 'black') {
         side,
         position: [x, side === 'white' ? 7 - y : y],
       }
-    })
+    }),
   )
 }
 
@@ -257,7 +248,7 @@ function getPositionLookup(board: Piece[]) {
 
 function findParentElement(
   node: Element | null | undefined,
-  filter: (node: Element) => boolean
+  filter: (node: Element) => boolean,
 ): Element | null {
   if (node == null) {
     return null

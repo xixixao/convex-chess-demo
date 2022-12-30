@@ -1,46 +1,38 @@
 import {
-  Box,
   Button,
   Container,
   Divider,
-  Flex,
   Heading,
   HStack,
   Input,
-  SkeletonText,
   Spinner,
-  useChakra,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useErrorModal } from '../client/useErrorModal'
-import { useMutation, useQuery } from '../convex/_generated/react'
+import { useQuery } from '../convex/_generated/react'
 import { Shimmer } from './Shimmer'
+import { useStatefulMutation } from './useStatefulMutation'
 
 export default function JoinGame() {
   const router = useRouter()
   const code = String(router.query.code ?? '')
   const [nickname, nicknameInput] = useNicknameInput()
-  const [isJoining, setIsJoining] = useState(false)
   const lobbyState = useQuery('lobbyState', code)
-  const [joinGameErrorModal, showJoinGameErrorModal] = useErrorModal(
-    'Could not join the game, please try again'
+
+  const [joinMutation, joinGame] = useStatefulMutation(
+    'joinGame',
+    'Could not join the game, please try again',
+    { repeateable: false },
   )
-  const joinGame = useMutation('joinGame')
   const handleJoinGame = () => {
-    setIsJoining(true)
-    joinGame(code, nickname)
-      .then((playerID) => {
-        window.location.href = `/game/${code.toUpperCase()}/${playerID}`
-      })
-      .catch((error) => {
-        showJoinGameErrorModal(error.message)
-      })
+    joinGame([code, nickname], (playerID) => {
+      window.location.href = `/game/${code.toUpperCase()}/${playerID}`
+    })
   }
 
   return (
     <Container my={10} centerContent gap={4}>
-      {joinGameErrorModal}
+      {joinMutation.errorModal}
       <Heading as="h1">Welcome to the game!</Heading>
       <HStack width={'100%'} justifyContent="center">
         <div>Your game code is: </div>
@@ -50,7 +42,7 @@ export default function JoinGame() {
       </HStack>
       <div>Send it to your friend so that they can join the game.</div>
       <Divider />
-      {isJoining ? (
+      {joinMutation.inFlight ? (
         <Spinner />
       ) : (
         <>
@@ -88,19 +80,4 @@ function useNicknameInput(): [string, JSX.Element] {
     />
   )
   return [nickname, nicknameInput]
-}
-
-function usePasswordInput(): [string, JSX.Element] {
-  const [password, setPassword] = useState('')
-  const nicknameInput = (
-    <Input
-      type="password"
-      maxLength={12}
-      width={180}
-      placeholder="password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-    />
-  )
-  return [password, nicknameInput]
 }

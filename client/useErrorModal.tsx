@@ -11,7 +11,7 @@ import {
 import { useState } from 'react'
 
 export function useErrorModal(
-  message: string
+  message: string,
 ): [JSX.Element, (error?: string) => void] {
   const [error, setError] = useState<string | null | undefined>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()

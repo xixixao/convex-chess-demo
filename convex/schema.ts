@@ -8,7 +8,7 @@ export default defineSchema({
       s.object({
         side: s.string(),
         name: s.string(),
-      })
+      }),
     ),
     currentSide: s.string(),
     moves: s.array(s.array(s.array(s.number()))),
