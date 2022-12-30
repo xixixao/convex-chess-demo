@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { CODE_LENGTH } from '../shared/Code'
+import { Page } from './Page'
 import { useStatefulMutation } from './useStatefulMutation'
 
 export default function CreateGame() {
@@ -27,9 +28,12 @@ export default function CreateGame() {
   const joinGameInput = useJoinGameInput()
 
   return (
-    <Container my={40} centerContent gap={4}>
+    <Page
+      my={40}
+      title="Welcome to online chess!"
+      errorMessage="Unexpected error, come back later"
+    >
       {createMutation.errorModal}
-      <Heading as="h1">Welcome to online chess!</Heading>
       <Box>No sign up required.</Box>
       {createMutation.inFlight ? (
         <Spinner />
@@ -41,7 +45,7 @@ export default function CreateGame() {
           {joinGameInput}
         </>
       )}
-    </Container>
+    </Page>
   )
 }
 

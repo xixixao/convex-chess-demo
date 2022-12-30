@@ -1,3 +1,4 @@
+import { CodedError } from '../server/CodedError'
 import { findGame } from '../server/findGame'
 import { Position } from '../shared/GameState'
 import { query } from './_generated/server'
@@ -5,12 +6,12 @@ import { query } from './_generated/server'
 export default query(async ({ db }, code: string, playerID: string) => {
   const game = await findGame(db, code)
   if (game == null) {
-    throw new Error('Game not found')
+    throw new CodedError('Game not found')
   }
   const players = game.players ?? new Map()
   const player = players.get(playerID)
   if (player == null) {
-    throw new Error('Player not found')
+    throw new CodedError('Player not found')
   }
   const otherPlayer = [...players.values()].find((p) => p.side !== player.side)
   return {

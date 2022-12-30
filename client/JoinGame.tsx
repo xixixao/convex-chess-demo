@@ -10,10 +10,23 @@ import {
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useQuery } from '../convex/_generated/react'
+import { Page } from './Page'
 import { Shimmer } from './Shimmer'
 import { useStatefulMutation } from './useStatefulMutation'
 
 export default function JoinGame() {
+  return (
+    <Page
+      my={10}
+      title="Welcome to the game!"
+      errorMessage="Wrong game code, start again"
+    >
+      <JoinAndSetNickname />
+    </Page>
+  )
+}
+
+function JoinAndSetNickname() {
   const router = useRouter()
   const code = String(router.query.code ?? '')
   const [nickname, nicknameInput] = useNicknameInput()
@@ -33,7 +46,6 @@ export default function JoinGame() {
   return (
     <Container my={10} centerContent gap={4}>
       {joinMutation.errorModal}
-      <Heading as="h1">Welcome to the game!</Heading>
       <HStack width={'100%'} justifyContent="center">
         <div>Your game code is: </div>
         <Shimmer width="50px" isLoaded={code !== ''}>

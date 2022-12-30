@@ -13,15 +13,19 @@ import Piece from 'react-chess-pieces'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { useQuery } from '../convex/_generated/react'
 import type { Position } from '../shared/GameState'
+import { Page } from './Page'
 import { Shimmer } from './Shimmer'
 import { useStatefulMutation } from './useStatefulMutation'
 
 export default function Game() {
   return (
-    <Container my={10} centerContent gap={4}>
-      <Heading as="h1">The game is afoot!</Heading>
+    <Page
+      my={10}
+      title="The game is afoot!"
+      errorMessage="Could not fetch game state"
+    >
       <Board />
-    </Container>
+    </Page>
   )
 }
 

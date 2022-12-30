@@ -9,6 +9,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { useState } from 'react'
+import { CodedError } from '../server/CodedError'
 
 export function useErrorModal(
   message: string,
@@ -28,7 +29,7 @@ export function useErrorModal(
       </ModalContent>
     </Modal>,
     (error) => {
-      setError(error)
+      setError(error != null ? CodedError.decode(error) : null)
       onOpen()
     },
   ]
