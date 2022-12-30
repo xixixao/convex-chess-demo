@@ -10,6 +10,9 @@ const convex = new ConvexReactClient(clientConfig)
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
+      <Head>
+        <title>Chess Online</title>
+      </Head>
       <ConvexProvider client={convex}>
         <Component {...pageProps} />
       </ConvexProvider>
