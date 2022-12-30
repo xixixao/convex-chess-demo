@@ -49,6 +49,7 @@ function Board() {
   const handleMovePiece = (piece: Piece, x: number, y: number) => {
     movePiece([code, playerID, [piece.position, [x, y]]])
   }
+  const isViewerWhite = gameState.viewer.side === 'white'
   return (
     <>
       {moveMutation.errorModal}
@@ -58,18 +59,23 @@ function Board() {
             Waiting for your opponent, the game code is: <strong>{code}</strong>
           </>
         ) : (
-          gameState.otherPlayer.name + ' is ' + gameState.otherPlayer.side
+          <>
+            <em>{gameState.otherPlayer.name}</em> is{' '}
+            {gameState.otherPlayer.side}
+          </>
         )}
       </div>
       <Checkered>
         {(rowIndex, colIndex) => {
-          const piece = pieceLookup(colIndex, rowIndex)
+          const x = isViewerWhite ? colIndex : 7 - colIndex
+          const y = isViewerWhite ? rowIndex : 7 - rowIndex
+          const piece = pieceLookup(x, y)
           return (
-            <Box bg={colIndex % 2 === rowIndex % 2 ? 'tomato' : '#ccc'}>
+            <Box bg={x % 2 !== y % 2 ? 'tomato' : '#ccc'}>
               <Box
                 data-name="cell"
-                data-x={colIndex}
-                data-y={rowIndex}
+                data-x={x}
+                data-y={y}
                 _selected={{ background: 'rgba(0, 0, 0, 0.2)' }}
                 width={CELL_SIZE}
                 height={CELL_SIZE}
@@ -87,7 +93,7 @@ function Board() {
         }}
       </Checkered>
       <div>
-        You, {gameState.viewer.name}, are {gameState.viewer.side}
+        You, <em>{gameState.viewer.name}</em>, are {gameState.viewer.side}
       </div>
       {gameState.currentSide === gameState.viewer.side
         ? "It's your turn!"
