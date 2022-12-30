@@ -18,6 +18,7 @@ import {
   Spinner,
   background,
   Divider,
+  Skeleton,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useRef, useState } from 'react'
@@ -30,6 +31,7 @@ import Draggable, {
   DraggableEvent,
   DraggableEventHandler,
 } from 'react-draggable'
+import { Shimmer } from './Shimmer'
 
 export default function Game() {
   return (
@@ -40,15 +42,26 @@ export default function Game() {
   )
 }
 
+const CELL_SIZE = '50px'
+
 function Board() {
   const router = useRouter()
-  const code = String(router.query.code)
-  const playerID = String(router.query.playerID)
+  const code = String(router.query.code ?? '')
+  const playerID = String(router.query.playerID ?? '')
   const gameState = useQuery('gameState', code, playerID)
   const movePiece = useMutation('movePiece')
 
   if (gameState == null) {
-    return <Spinner />
+    return (
+      <>
+        <Shimmer width="60%" />
+        <Checkered>
+          {(rowIndex, colIndex) => (
+            <Skeleton width={CELL_SIZE} height={CELL_SIZE} />
+          )}
+        </Checkered>
+      </>
+    )
   }
 
   const pieceLookup = getPositionLookup(getBoard(gameState.moves))
@@ -66,33 +79,31 @@ function Board() {
           gameState.otherPlayer.name + ' is ' + gameState.otherPlayer.side
         )}
       </div>
-      <SimpleGrid columns={8} spacing={1}>
-        {[...Array(8)].map((_, rowIndex) =>
-          [...Array(8)].map((_, colIndex) => {
-            const piece = pieceLookup(colIndex, rowIndex)
-            return (
-              <Box bg={colIndex % 2 === rowIndex % 2 ? 'tomato' : '#ccc'}>
-                <Box
-                  data-name="cell"
-                  data-x={colIndex}
-                  data-y={rowIndex}
-                  _selected={{ background: 'rgba(0, 0, 0, 0.2)' }}
-                  width="50px"
-                  height="50px"
-                >
-                  {piece != null ? (
-                    <DraggablePiece
-                      viewerSide={gameState.viewer.side}
-                      movePiece={handleMovePiece}
-                      piece={piece}
-                    />
-                  ) : null}
-                </Box>
+      <Checkered>
+        {(rowIndex, colIndex) => {
+          const piece = pieceLookup(colIndex, rowIndex)
+          return (
+            <Box bg={colIndex % 2 === rowIndex % 2 ? 'tomato' : '#ccc'}>
+              <Box
+                data-name="cell"
+                data-x={colIndex}
+                data-y={rowIndex}
+                _selected={{ background: 'rgba(0, 0, 0, 0.2)' }}
+                width={CELL_SIZE}
+                height={CELL_SIZE}
+              >
+                {piece != null ? (
+                  <DraggablePiece
+                    viewerSide={gameState.viewer.side}
+                    movePiece={handleMovePiece}
+                    piece={piece}
+                  />
+                ) : null}
               </Box>
-            )
-          })
-        )}
-      </SimpleGrid>
+            </Box>
+          )
+        }}
+      </Checkered>
       <div>
         You, {gameState.viewer.name}, are {gameState.viewer.side}
       </div>
@@ -102,6 +113,18 @@ function Board() {
       <Divider />
       Bookmark this page to come back to the game.
     </>
+  )
+}
+
+function Checkered(props: {
+  children: (rowIndex: number, colIndex: number) => React.ReactNode
+}) {
+  return (
+    <SimpleGrid columns={8} spacing={1}>
+      {[...Array(8)].map((_, rowIndex) =>
+        [...Array(8)].map((_, colIndex) => props.children(rowIndex, colIndex))
+      )}
+    </SimpleGrid>
   )
 }
 

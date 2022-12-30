@@ -1,19 +1,25 @@
 import {
+  Box,
   Button,
   Container,
   Divider,
+  Flex,
   Heading,
+  HStack,
   Input,
+  SkeletonText,
   Spinner,
+  useChakra,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useErrorModal } from '../client/useErrorModal'
 import { useMutation, useQuery } from '../convex/_generated/react'
+import { Shimmer } from './Shimmer'
 
 export default function JoinGame() {
   const router = useRouter()
-  const code = String(router.query.code)
+  const code = String(router.query.code ?? '')
   const [nickname, nicknameInput] = useNicknameInput()
   const [isJoining, setIsJoining] = useState(false)
   const lobbyState = useQuery('lobbyState', code)
@@ -36,21 +42,31 @@ export default function JoinGame() {
     <Container my={10} centerContent gap={4}>
       {joinGameErrorModal}
       <Heading as="h1">Welcome to the game!</Heading>
-      <div>
-        Your game code is: <strong>{code}</strong>
-      </div>
+      <HStack width={'100%'} justifyContent="center">
+        <div>Your game code is: </div>
+        <Shimmer width="50px" isLoaded={code !== ''}>
+          <strong>{code}</strong>
+        </Shimmer>
+      </HStack>
       <div>Send it to your friend so that they can join the game.</div>
       <Divider />
       {isJoining ? (
         <Spinner />
       ) : (
         <>
-          <div>The first player to join will be white.</div>
-          {(lobbyState?.numPlayersJoined ?? 0) >= 2 ? (
-            <div>The game is full</div>
-          ) : (lobbyState?.numPlayersJoined ?? 0) >= 1 ? (
-            <div>You will be black</div>
-          ) : null}
+          {lobbyState == null ? (
+            <Shimmer width="50%" />
+          ) : (
+            <div>
+              {(lobbyState.numPlayersJoined ?? 0) >= 2 ? (
+                <>The game is full</>
+              ) : (lobbyState.numPlayersJoined ?? 0) >= 1 ? (
+                <>You will be black</>
+              ) : (
+                <>The first player to join will be white.</>
+              )}
+            </div>
+          )}
           What will be your nickname for this game?
           {nicknameInput}
           <Button onClick={handleJoinGame}>Join</Button>

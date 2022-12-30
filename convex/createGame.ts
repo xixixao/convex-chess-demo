@@ -1,7 +1,6 @@
 import { generateCode } from '../server/generateCode'
+import { CODE_LENGTH } from '../shared/Code'
 import { mutation } from './_generated/server'
-
-const CODE_LENGTH = 3
 
 export default mutation(async ({ db }) => {
   let code = null

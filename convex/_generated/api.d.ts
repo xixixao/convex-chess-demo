@@ -10,6 +10,7 @@
  */
 
 import type { ApiFromModules } from "convex/api";
+import type * as checkGame from "../checkGame";
 import type * as createGame from "../createGame";
 import type * as gameState from "../gameState";
 import type * as joinGame from "../joinGame";
@@ -26,6 +27,7 @@ import type * as movePiece from "../movePiece";
  * `ConvexReactClient` to create app-specific types.
  */
 export type API = ApiFromModules<{
+  checkGame: typeof checkGame;
   createGame: typeof createGame;
   gameState: typeof gameState;
   joinGame: typeof joinGame;
