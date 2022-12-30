@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { useQuery } from '../convex/_generated/react'
 import { Page } from './Page'
 import { Shimmer } from './Shimmer'
+import { useNavigate } from './useNavigate'
 import { useStatefulMutation } from './useStatefulMutation'
 
 export default function JoinGame() {
@@ -28,6 +29,7 @@ export default function JoinGame() {
 
 function JoinAndSetNickname() {
   const router = useRouter()
+  const navigate = useNavigate()
   const code = String(router.query.code ?? '')
   const [nickname, nicknameInput] = useNicknameInput()
   const lobbyState = useQuery('lobbyState', code)
@@ -39,7 +41,7 @@ function JoinAndSetNickname() {
   )
   const handleJoinGame = () => {
     joinGame([code, nickname], (playerID) => {
-      window.location.href = `/game/${code.toUpperCase()}/${playerID}`
+      navigate(`/game/${code.toUpperCase()}/${playerID}`)
     })
   }
 

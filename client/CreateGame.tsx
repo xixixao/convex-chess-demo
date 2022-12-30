@@ -10,9 +10,11 @@ import {
 import { useEffect, useState } from 'react'
 import { CODE_LENGTH } from '../shared/Code'
 import { Page } from './Page'
+import { useNavigate } from './useNavigate'
 import { useStatefulMutation } from './useStatefulMutation'
 
 export default function CreateGame() {
+  const navigate = useNavigate()
   const [createMutation, createGame] = useStatefulMutation(
     'createGame',
     'Could not create game, please try again',
@@ -21,7 +23,7 @@ export default function CreateGame() {
 
   const handleCreateGame = () => {
     createGame([], (result) => {
-      window.location.href = `/game/${result.toUpperCase()}`
+      navigate(`/game/${result.toUpperCase()}`)
     })
   }
 
@@ -58,10 +60,12 @@ function useJoinGameInput() {
     { repeateable: false },
   )
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     if (code.length === CODE_LENGTH) {
       checkGame([code], (_success) => {
-        window.location.href = `/game/${code.toUpperCase()}`
+        navigate(`/game/${code.toUpperCase()}`)
       })
     }
   }, [code])

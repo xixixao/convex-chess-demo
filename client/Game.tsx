@@ -71,7 +71,7 @@ function Board() {
           const y = isViewerWhite ? rowIndex : 7 - rowIndex
           const piece = pieceLookup(x, y)
           return (
-            <Box bg={x % 2 !== y % 2 ? 'tomato' : '#ccc'}>
+            <Box key={x + '' + y} bg={x % 2 !== y % 2 ? 'tomato' : '#ccc'}>
               <Box
                 data-name="cell"
                 data-x={x}
@@ -109,8 +109,12 @@ function BoardShimmer() {
     <>
       <Shimmer width="60%" />
       <Checkered>
-        {(_rowIndex, _colIndex) => (
-          <Skeleton width={CELL_SIZE} height={CELL_SIZE} />
+        {(rowIndex, colIndex) => (
+          <Skeleton
+            key={rowIndex + '' + colIndex}
+            width={CELL_SIZE}
+            height={CELL_SIZE}
+          />
         )}
       </Checkered>
     </>
