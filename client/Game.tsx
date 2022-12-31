@@ -29,7 +29,7 @@ export default function Game() {
   )
 }
 
-const CELL_SIZE = ['40px', '50px']
+const CELL_SIZE = ['35px', '50px']
 
 function Board() {
   const router = useRouter()
