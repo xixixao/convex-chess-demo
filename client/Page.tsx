@@ -43,7 +43,9 @@ function PageSkeleton(props: {
     <Container display="flex" flexDirection="column" my={2} alignItems="end">
       {isHome ? null : <CloseButton onClick={navigateHome} />}
       <Container centerContent gap={4} role={props.role} my={props.my}>
-        <Heading as="h1">{props.title}</Heading>
+        <Heading as="h1" size={['lg', 'xl']}>
+          {props.title}
+        </Heading>
         {props.children}
       </Container>
     </Container>

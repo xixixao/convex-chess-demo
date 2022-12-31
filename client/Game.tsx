@@ -20,7 +20,7 @@ import { useStatefulMutation } from './useStatefulMutation'
 export default function Game() {
   return (
     <Page
-      my={10}
+      my={[0, 10]}
       title="The game is afoot!"
       errorMessage="Could not fetch game state"
     >
@@ -29,7 +29,7 @@ export default function Game() {
   )
 }
 
-const CELL_SIZE = '50px'
+const CELL_SIZE = ['40px', '50px']
 
 function Board() {
   const router = useRouter()
