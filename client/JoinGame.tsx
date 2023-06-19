@@ -9,11 +9,12 @@ import {
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useQuery } from '../convex/_generated/react'
 import { Page } from './Page'
 import { Shimmer } from './Shimmer'
 import { useNavigate } from './useNavigate'
 import { useStatefulMutation } from './useStatefulMutation'
+import { useQuery } from 'convex/react'
+import { api } from '../convex/_generated/api'
 
 export default function JoinGame() {
   return (
@@ -32,15 +33,15 @@ function JoinAndSetNickname() {
   const navigate = useNavigate()
   const code = String(router.query.code ?? '')
   const [nickname, nicknameInput] = useNicknameInput()
-  const lobbyState = useQuery('lobbyState', code)
+  const lobbyState = useQuery(api.lobby.state, { code })
 
   const [joinMutation, joinGame] = useStatefulMutation(
-    'joinGame',
+    api.game.join,
     'Could not join the game, please try again',
     { repeateable: false },
   )
   const handleJoinGame = () => {
-    joinGame([code, nickname], (playerID) => {
+    joinGame({ code, name: nickname }, (playerID) => {
       navigate(`/game/${code.toUpperCase()}/${playerID}`)
     })
   }

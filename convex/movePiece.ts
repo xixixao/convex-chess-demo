@@ -6,9 +6,11 @@ import { mutation } from './_generated/server'
 export default mutation(
   async (
     { db },
-    code: string,
-    playerID: string,
-    move: [Position, Position],
+    {
+      code,
+      playerID,
+      move,
+    }: { code: string; playerID: string; move: [Position, Position] },
   ) => {
     const game = await findGame(db, code)
     if (game == null) {

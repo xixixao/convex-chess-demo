@@ -1,12 +1,18 @@
-import { MutationNames } from 'convex/dist/types/api/api'
-import { NamedMutation } from 'convex/dist/types/browser/browser'
+import { useMutation } from 'convex/react'
+import {
+  DefaultFunctionArgs,
+  FunctionArgs,
+  FunctionReference,
+  FunctionReturnType,
+  OptionalRestArgs,
+} from 'convex/server'
 import { useCallback, useState } from 'react'
 import { useErrorModal } from '../client/useErrorModal'
-import { API } from '../convex/_generated/api'
-import { useMutation } from '../convex/_generated/react'
 
-export function useStatefulMutation<Name extends MutationNames<API>>(
-  name: Name,
+export function useStatefulMutation<
+  Mutation extends FunctionReference<'mutation', 'public'>,
+>(
+  mutation: Mutation,
   errorMessage: string,
   config: {
     repeateable: boolean
@@ -14,21 +20,21 @@ export function useStatefulMutation<Name extends MutationNames<API>>(
 ): [
   { inFlight: boolean; errorModal: React.ReactNode },
   (
-    args: Parameters<NamedMutation<API, Name>>,
-    onResponse?: (response: ReturnType<NamedMutation<API, Name>>) => void,
+    args: Mutation['_args'],
+    onResponse?: (response: FunctionReturnType<Mutation>) => void,
   ) => void,
 ] {
   const [inFlight, setInFlight] = useState(false)
   const [errorModal, showErrorModal] = useErrorModal(errorMessage)
 
-  const mutate = useMutation(name)
+  const mutate = useMutation(mutation)
   const mutateWithErrorHandling = useCallback(
     (
-      args: Parameters<NamedMutation<API, Name>>,
-      onResponse?: (response: ReturnType<NamedMutation<API, Name>>) => void,
+      args: Mutation['_args'],
+      onResponse?: (response: FunctionReturnType<Mutation>) => void,
     ) => {
       setInFlight(true)
-      mutate(...args)
+      mutate(args)
         .then((response) => {
           onResponse?.(response)
           if (config.repeateable) {

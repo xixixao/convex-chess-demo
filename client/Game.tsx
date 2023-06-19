@@ -11,11 +11,12 @@ import { useRef, useState } from 'react'
 // @ts-ignore
 import Piece from 'react-chess-pieces'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
-import { useQuery } from '../convex/_generated/react'
 import type { Position } from '../shared/GameState'
 import { Page } from './Page'
 import { Shimmer } from './Shimmer'
 import { useStatefulMutation } from './useStatefulMutation'
+import { useQuery } from 'convex/react'
+import { api } from '../convex/_generated/api'
 
 export default function Game() {
   return (
@@ -35,9 +36,9 @@ function Board() {
   const router = useRouter()
   const code = String(router.query.code ?? '')
   const playerID = String(router.query.playerID ?? '')
-  const gameState = useQuery('gameState', code, playerID)
+  const gameState = useQuery(api.game.state, { code, playerID })
   const [moveMutation, movePiece] = useStatefulMutation(
-    'movePiece',
+    api.movePiece.default,
     'Invalid move',
   )
 
@@ -47,7 +48,7 @@ function Board() {
 
   const pieceLookup = getPositionLookup(getBoard(gameState.moves))
   const handleMovePiece = (piece: Piece, x: number, y: number) => {
-    movePiece([code, playerID, [piece.position, [x, y]]])
+    movePiece({ code, playerID, move: [piece.position, [x, y]] })
   }
   const isViewerWhite = gameState.viewer.side === 'white'
   return (

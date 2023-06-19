@@ -12,17 +12,18 @@ import { CODE_LENGTH } from '../shared/Code'
 import { Page } from './Page'
 import { useNavigate } from './useNavigate'
 import { useStatefulMutation } from './useStatefulMutation'
+import { api } from '../convex/_generated/api'
 
 export default function CreateGame() {
   const navigate = useNavigate()
   const [createMutation, createGame] = useStatefulMutation(
-    'createGame',
+    api.game.create,
     'Could not create game, please try again',
     { repeateable: false },
   )
 
   const handleCreateGame = () => {
-    createGame([], (result) => {
+    createGame({}, (result) => {
       navigate(`/game/${result.toUpperCase()}`)
     })
   }
@@ -55,7 +56,7 @@ function useJoinGameInput() {
   const [code, setCode] = useState('')
 
   const [checkMutation, checkGame] = useStatefulMutation(
-    'checkGame',
+    api.game.check,
     'This code is not valid',
     { repeateable: false },
   )
@@ -64,7 +65,7 @@ function useJoinGameInput() {
 
   useEffect(() => {
     if (code.length === CODE_LENGTH) {
-      checkGame([code], (_success) => {
+      checkGame({ code }, (_success) => {
         navigate(`/game/${code.toUpperCase()}`)
       })
     }

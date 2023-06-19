@@ -1,16 +1,17 @@
-import { defineSchema, defineTable, s } from 'convex/schema'
+import { defineSchema, defineTable } from 'convex/schema'
+import { v } from 'convex/values'
 
 export default defineSchema({
   games: defineTable({
-    code: s.string(),
-    players: s.map(
-      s.string(),
-      s.object({
-        side: s.string(),
-        name: s.string(),
+    code: v.string(),
+    players: v.map(
+      v.string(),
+      v.object({
+        side: v.string(),
+        name: v.string(),
       }),
     ),
-    currentSide: s.string(),
-    moves: s.array(s.array(s.array(s.number()))),
+    currentSide: v.string(),
+    moves: v.array(v.array(v.array(v.number()))),
   }),
 })

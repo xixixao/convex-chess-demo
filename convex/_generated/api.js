@@ -9,10 +9,7 @@
  * @module
  */
 
-import type { ApiFromModules } from "convex/server";
-import type * as game from "../game";
-import type * as lobby from "../lobby";
-import type * as movePiece from "../movePiece";
+import { anyApi } from "convex/server";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -22,8 +19,4 @@ import type * as movePiece from "../movePiece";
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-export declare const api: ApiFromModules<{
-  game: typeof game;
-  lobby: typeof lobby;
-  movePiece: typeof movePiece;
-}>;
+export const api = anyApi;
