@@ -2,6 +2,7 @@ import { CodedError } from '../server/CodedError'
 import { findGame } from '../server/findGame'
 import { Position } from '../shared/GameState'
 import { mutation } from './_generated/server'
+import { getPlayer } from './game'
 
 export default mutation(
   async (
@@ -17,7 +18,7 @@ export default mutation(
       throw new CodedError('Game not found')
     }
     const players = game.players ?? new Map()
-    const player = players.get(playerID)
+    const player = getPlayer(players, playerID)
     if (player == null) {
       throw new CodedError('Player not found')
     }

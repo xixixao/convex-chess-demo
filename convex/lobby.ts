@@ -9,6 +9,6 @@ export const state = query(async ({ db }, { code }: { code: string }) => {
   }
   const players = game.players ?? new Map()
   return {
-    numPlayersJoined: players.size,
+    numPlayersJoined: players.length,
   }
 })
