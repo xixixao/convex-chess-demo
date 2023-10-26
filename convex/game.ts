@@ -21,7 +21,7 @@ export const create = mutation(async ({ db }) => {
 
   await db.insert('games', {
     code,
-    players: new Map(),
+    players: [],
     currentSide: 'white',
     moves: [],
   })
@@ -43,7 +43,7 @@ export const state = query(
       throw new CodedError('Game not found')
     }
     const players = game.players ?? new Map()
-    const player = players.get(playerID)
+    const player = getPlayer(players, playerID)
     if (player == null) {
       throw new CodedError('Player not found')
     }
@@ -79,7 +79,7 @@ export const join = mutation(
     }
 
     const players = game.players ?? new Map()
-    const playerCount = players.size
+    const playerCount = players.length
     switch (playerCount) {
       case 0: {
         return await addPlayer(db, game, players, 'white', name)
@@ -101,12 +101,16 @@ async function addPlayer(
   name: string,
 ) {
   let playerID = generatePlayerID()
-  while (players.has(playerID)) {
+  while (getPlayer(players, playerID)) {
     playerID = generatePlayerID()
   }
-  players.set(playerID, { side, name })
+  players.push({ id: playerID, side, name })
   await db.patch(game._id, { players })
   return playerID
+}
+
+export function getPlayer(players: Doc<'games'>['players'], playerID: string) {
+  return players.find(({ id }) => id === playerID)
 }
 
 const PLAYER_ID_LENGTH = 10
